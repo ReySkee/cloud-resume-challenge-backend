@@ -1,3 +1,3 @@
 # cloud-resume-challenge-backend
 
-This is the api built from an Azure Function using Javascript
+API built to communicate with Azure Cosmos DB and return a value back to the front-end
