@@ -19,31 +19,49 @@ const tableClient = new TableClient(
 module.exports = async function (context, req) {
   context.log("JavaScript HTTP trigger function processed a request.");
 
-  const oldNumber = await tableClient.getEntity("1", "1").catch((error) => {
-    // handle any errors
-  });
+  // Get the current count from the table
+  const oldNumber = await tableClient
+    .getEntity("1", "1")
+    .then((result) => result.count)
+    .catch((error) => {
+      context.res = {
+        status: 500,
+        body: error,
+      };
+      return;
+    });
 
-  const newNumber = oldNumber.count + 1;
+  if (oldNumber !== undefined) {
+    // Increment the count
+    const newNumber = oldNumber + 1;
 
-  const task = {
-    partitionKey: "1",
-    rowKey: "1",
-    count: newNumber,
-  };
+    // Update the count in the table
+    const task = {
+      partitionKey: "1",
+      rowKey: "1",
+      count: newNumber,
+    };
+    await tableClient.updateEntity(task);
 
-  const add = await tableClient.updateEntity(task, "Replace");
+    // Get the updated count from the table
+    const newCount = await tableClient
+      .getEntity("1", "1")
+      .then((result) => result.count)
+      .catch((error) => {
+        context.res = {
+          status: 500,
+          body: error,
+        };
+        return;
+      });
 
-  const newCount = await tableClient.getEntity("1", "1").catch((error) => {
-    // handle any errors
-  });
-
-  // result contains the entity
-  // Entity create
-  const name = req.query.name || (req.body && req.body.name);
-  const responseMessage = { count: newCount.count };
-
-  context.res = {
-    status: 200 /* Defaults to 200 */,
-    body: responseMessage,
-  };
+    if (newCount !== undefined) {
+      // Return the count in the response
+      const responseMessage = { count: newCount };
+      context.res = {
+        status: 200 /* Defaults to 200 */,
+        body: responseMessage,
+      };
+    }
+  }
 };
