@@ -42,3 +42,8 @@ jobs:
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_649234DF872446D4879667B01FDBE777 }}
+        env: 
+          TABLE_NAME: ${{ secrets.TABLE_NAME }}
+          ACCOUNT_KEY: ${{ secrets.ACCOUNT_KEY }}
+          ENDPOINT: ${{ secrets.ENDPOINT }}
+          ACCOUNT_NAME: ${{ secrets.ACCOUNT_NAME }}
