@@ -41,7 +41,7 @@ module.exports = async function (context, req) {
       rowKey: "1",
       count: newNumber,
     };
-    await tableClient.updateEntity(task);
+    await tableClient.upsertEntity(task);
 
     // Get the updated count from the table
     const newCount = await tableClient
