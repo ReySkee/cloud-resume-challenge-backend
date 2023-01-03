@@ -19,15 +19,16 @@ const tableClient = new TableClient(
 module.exports = async function (context, req) {
   context.log("JavaScript HTTP trigger function processed a request.");
 
-  // Makes sure the row exist
+  // Makes sure the entity exist
   const initialTask = {
     partitionKey: "1",
     rowKey: "1"
   };
   await tableClient.upsertEntity(initialTask);
 
+
   // Get the current count from the table
-  const oldNumber = await tableClient
+  let oldNumber = await tableClient
     .getEntity("1", "1")
     .then((result) => result.count)
     .catch((error) => {
@@ -37,6 +38,16 @@ module.exports = async function (context, req) {
       };
       return;
     });
+  
+  if (oldNumber == undefined){
+    const addCount = {
+      partitionKey: "1",
+      rowKey: "1",
+      count: 0
+    };
+    await tableClient.upsertEntity(addCount);
+    oldNumber = 0;
+  }
 
   if (oldNumber !== undefined) {
     // Increment the count
